@@ -1,16 +1,115 @@
-protax1040-app/
-  app/
-    page.tsx
-    appointments/page.tsx
-    upload/page.tsx
-    login/page.tsx
-    dashboard/page.tsx
-  components/Nav.tsx
-  styles/globals.css
-  package.json
-  tailwind.config.ts
-  tsconfig.json
-  postcss.config.js
-  next.config.js
-  next-env.d.ts
-  README.md
+
+export default function Appointments(){const calendly='https://calendly.com/thetaxplaceincc/30min?hide_gdpr_banner=1';return(<section><h1 className='text-3xl font-extrabold'>Book an Appointment</h1><p className='mt-2 text-slate-700'>Choose a time that works for you. You’ll get a confirmation and reminders.</p><div className='mt-6 card overflow-hidden'><iframe src={calendly} style={{minWidth:'320px',height:'850px',width:'100%'}}></iframe></div><div className='mt-6 grid md:grid-cols-2 gap-6'><div className='card p-6'><h2 className='text-xl font-semibold'>Prefer to call?</h2><p className='mt-2'>Reach us at <strong>1-800-341-6892</strong>. We’ll book it for you.</p></div><div className='card p-6'><h2 className='text-xl font-semibold'>Request by email</h2><p className='mt-2'>Send preferred dates/times and your number.</p><a className='btn-primary mt-3' href='mailto:contact@mydirectsolutions.com?subject=Appointment%20Request'>Email a request</a></div></div></section>)}
+export default function Dashboard(){const items=[{name:'W‑2.pdf',size:'0.8 MB',status:'Received'},{name:'1099-NEC.png',size:'0.4 MB',status:'Needs review'},{name:'ID-front.jpg',size:'0.2 MB',status:'Received'}];return(<section><h1 className='text-3xl font-bold'>Client Dashboard (Demo)</h1><p className='text-slate-600 mt-1'>Track your return status, documents, and messages.</p><div className='card p-6 mt-6'><h2 className='font-semibold'>Documents</h2><div className='mt-3 grid gap-2'>{items.map((it,i)=>(<div key={i} className='flex items-center justify-between border rounded-2xl p-3'><span className='truncate mr-2'>{it.name}</span><span className='text-slate-500'>{it.size}</span><span className='text-xs px-2 py-1 rounded-full bg-blue-50 border'>{it.status}</span></div>))}</div></div></section>)}
+'use client';
+import {useState} from 'react';
+export default function Login(){const [email,setEmail]=useState('');const [pwd,setPwd]=useState('');const submit=(e:any)=>{e.preventDefault();alert('Demo only. No real auth.')};return(<section className='max-w-md mx-auto card p-6'><h1 className='text-2xl font-bold'>Login (Demo)</h1><p className='text-sm text-slate-600 mt-1'>This is a placeholder. Hook to your auth later.</p><form onSubmit={submit} className='mt-4 grid gap-3'><input className='px-3 py-2 rounded-2xl border' placeholder='Email' value={email} onChange={e=>setEmail(e.target.value)}/><input type='password' className='px-3 py-2 rounded-2xl border' placeholder='Password' value={pwd} onChange={e=>setPwd(e.target.value)}/><button className='btn-primary' type='submit'>Sign in</button></form></section>)}
+'use client';
+import {useState,useRef,useEffect} from 'react';
+export default function Upload(){const[files,setFiles]=useState<File[]>([]);const[status,setStatus]=useState('');const dropRef=useRef<HTMLDivElement>(null);useEffect(()=>{const el=dropRef.current;if(!el)return;const prevent=(e:any)=>{e.preventDefault();e.stopPropagation();};const onDrop=(e:any)=>{prevent(e);if(e.dataTransfer?.files?.length)handleFiles(e.dataTransfer.files)};['dragenter','dragover','dragleave','drop'].forEach(evt=>el.addEventListener(evt,prevent));el.addEventListener('drop',onDrop);return()=>{['dragenter','dragover','dragleave','drop'].forEach(evt=>el.removeEventListener(evt,prevent));el.removeEventListener('drop',onDrop);};},[]);function handleFiles(list:FileList|File[]){const arr=Array.from(list||[]);const allowed=['application/pdf','image/jpeg','image/png','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document'];const max=25*1024*1024;const ok=arr.filter(f=>allowed.includes(f.type)&&f.size<=max);const bad=arr.filter(f=>!allowed.includes(f.type)||f.size>max);if(bad.length)setStatus('Some files were skipped (type/size limits).');setFiles(prev=>[...prev,...ok]);}
+async function submit(){if(!files.length){setStatus('Add at least one file.');return;}setStatus('Encrypting & uploading… (demo)');await new Promise(r=>setTimeout(r,800));setFiles([]);setStatus('Uploaded securely. We’ll notify you by email. (demo)');}
+return(<section className='max-w-2xl mx-auto card p-6'><h1 className='text-2xl font-bold'>Secure Upload (Demo)</h1><div ref={dropRef} className='mt-4 border-2 border-dashed rounded-2xl p-8 text-center bg-blue-50 border-blue-300'><div className='text-3xl mb-2'>⬆️</div><p className='font-medium'>Drag & drop files here</p><p className='text-sm text-slate-600'>PDF, JPG/PNG, DOC/DOCX • up to 25 MB each</p><div className='mt-4'><label className='btn-primary cursor-pointer'><input type='file' className='hidden' multiple onChange={(e)=> e.target.files && handleFiles(e.target.files)}/>Choose files</label></div></div>{!!files.length&&(<div className='mt-4 bg-slate-100 rounded-2xl p-4 max-h-48 overflow-auto'><p className='font-medium mb-2'>Files ready:</p><ul className='space-y-1 text-sm'>{files.map((f,i)=>(<li key={i} className='flex items-center justify-between'><span className='truncate mr-2'>{f.name}</span><span className='text-slate-500'>{(f.size/1024/1024).toFixed(2)} MB</span></li>))}</ul></div>)}<div className='mt-6 flex items-center justify-between'><button onClick={()=>{setFiles([]);setStatus('');}} className='btn-outline'>Clear</button><button onClick={submit} className='btn-accent'>Submit securely</button></div>{status&&<p className='mt-3 text-sm text-slate-700'>{status}</p>}<p className='mt-6 text-xs text-slate-500'>By uploading, you agree to our Privacy Policy and Client Agreement.</p></section>)}
+import '../styles/globals.css';
+import Nav from '../components/Nav';
+export const metadata={title:'ProTax 1040 App',description:'Client portal + admin demo'};
+export default function RootLayout({children}:{children:React.ReactNode}){
+  return(<html lang='en'><body><Nav/><main className='container py-8'>{children}</main><footer className='bg-blue-950 text-white mt-16'><div className='container py-12 grid md:grid-cols-3 gap-8'><div><div className='w-10 h-10 rounded-xl bg-white text-blue-900 grid place-items-center font-bold'>PT</div><p className='text-sm mt-3 opacity-90'>Direct Tax Solutions • ProTax 1040</p><p className='text-sm opacity-90'>Orlando, FL</p></div><div><p className='font-semibold'>Contact</p><div className='mt-3 space-y-2 text-sm opacity-90'><p>📞 1-800-341-6892</p><p>✉️ contact@mydirectsolutions.com</p></div></div><div><p className='font-semibold'>Legal</p><ul className='mt-3 space-y-2 text-sm opacity-90'><li><a className='link' href='#'>Privacy Policy</a></li><li><a className='link' href='#'>Client Agreement</a></li><li><a className='link' href='#'>Data Security</a></li></ul></div></div><div className='text-center text-xs opacity-80 py-6'>© {new Date().getFullYear()} ProTax 1040. All rights reserved.</div></footer></body></html>)}
+export default function Home(){return(<section><div className='grid md:grid-cols-2 gap-10 items-center'><div><h1 className='text-3xl md:text-5xl font-extrabold leading-tight'>ProTax 1040 — Client Portal (Demo)</h1><p className='mt-4 text-slate-700'>Secure uploads, appointment booking, and status — all in one place.</p><div className='mt-6 flex flex-wrap gap-3'><a className='btn-primary' href='/upload'>⬆️ Secure Upload</a><a className='btn-outline' href='/appointments'>Book Appointment</a><a className='btn-accent' href='/dashboard'>Client Dashboard</a></div><div className='mt-6 text-sm text-slate-600'><p>Bank‑level encryption • MFA logins • IRS‑compliant retention</p></div></div><div className='card p-6'><h3 className='text-xl font-semibold'>Quick Intake</h3><p className='text-sm text-slate-600 mt-1'>Answer a few questions, then upload securely.</p><form className='mt-4 grid gap-3'><input className='px-3 py-2 rounded-2xl border' placeholder='Full name'/><input type='email' className='px-3 py-2 rounded-2xl border' placeholder='Email'/><input className='px-3 py-2 rounded-2xl border' placeholder='Phone'/><select className='px-3 py-2 rounded-2xl border'><option>Filing as: Individual</option><option>Filing as: Business</option></select><a className='btn-accent mt-2' href='/upload'>Continue to Secure Upload</a></form></div></div></section>)}
+export default function Nav(){return(<header className='sticky top-0 z-40 backdrop-blur bg-white/80 border-b'><div className='container py-3 flex items-center justify-between'><a href='/' className='flex items-center gap-2'><div className='w-9 h-9 rounded-xl bg-blue-800 text-white grid place-items-center font-bold'>PT</div><span className='font-semibold'>ProTax 1040</span></a><nav className='hidden md:flex items-center gap-6 text-sm'><a className='hover:text-blue-800' href='/upload'>Upload</a><a className='hover:text-blue-800' href='/appointments'>Appointments</a><a className='hover:text-blue-800' href='/dashboard'>Dashboard</a><a className='hover:text-blue-800' href='/login'>Login</a></nav><div className='flex items-center gap-2'><a href='/appointments' className='px-3 py-2 rounded-2xl bg-blue-800 text-white text-sm'>Book a Call</a></div></div></header>)}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root{color-scheme:light}
+body{@apply bg-white text-slate-900}
+.card{@apply bg-white border rounded-2xl shadow-sm}
+.btn{@apply inline-flex items-center justify-center px-4 py-2 rounded-2xl font-medium}
+.btn-primary{@apply btn bg-primary text-white hover:bg-blue-900}
+.btn-outline{@apply btn border hover:border-primary}
+.btn-accent{@apply btn bg-accent text-white hover:bg-red-700}
+.container{@apply max-w-6xl mx-auto px-4}
+.link{@apply underline hover:text-primary}
+/** @type {import('next').NextConfig} */
+const nextConfig={reactStrictMode:true};
+module.exports=nextConfig;
+/// <reference types="next" />
+/// <reference types="next/types/global" />
+/// <reference types="next/image-types/global" />    {
+  "name": "protax1040-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "14.2.5",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "10.4.19",
+    "postcss": "8.4.38",
+    "tailwindcss": "3.4.7",
+    "typescript": "5.4.5"
+  }
+}
+module.exports={plugins:{tailwindcss:{},autoprefixer:{}}};
+
+# ProTax 1040 App (Next.js + Tailwind)
+
+A ready-to-deploy client portal prototype: secure uploads (demo), appointments (Calendly), login (demo), and dashboard.
+
+## Quick Start (Local)
+1) Install Node.js 18+
+2) npm install
+3) npm run dev
+4) Open http://localhost:3000
+
+## Deploy on Vercel
+- Import this repo in Vercel (Framework: Next.js)
+- Click Deploy
+
+## Domain
+- Add `app.protax1040.org` to the Vercel project (Settings → Domains)
+- At your registrar, create a CNAME for `app` → `cname.vercel-dns.com`
+
+## Notes
+- Uploads are demo only; replace with your storage (S3 + presigned URLs, etc.).
+- Login is demo only; connect to your auth (Clerk/Auth0/Supabase) later.
+import type { Config } from 'tailwindcss';
+const config:Config={content:['./app/**/*.{ts,tsx}','./components/**/*.{ts,tsx}'],theme:{extend:{colors:{primary:{DEFAULT:'#1e3a8a'},accent:{DEFAULT:'#dc2626'}},borderRadius:{'2xl':'1rem'}}},plugins:[]};
+export default config;
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "baseUrl": ".",
+    "paths": {}
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
